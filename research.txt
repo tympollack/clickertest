@@ -1,0 +1,28 @@
+acre of trees = .000072 kg/s
+
+trucks = .03 kg/s
+
+
+factories = .317 kg/s
+	carcinogins = .065 kg/s
+	
+	
+	
+14,500,000,000 acres trees at start
+9,880,000 acres now
+1 acre = 40-60 trees
+ d = 821.918 acre/d
+ 
+ avg tree width = 2.107 feet = 25.286 inches
+ 22 in = 1 cord,  25.286 = 1.149 cord = .87 trees/cord / 50 trees/acre = .0174 acre/cord
+ 1 cord = 2 tons = 909.1 kg = 54,247.126 kg/acre
+ * 821.918 acre/d = 44,586,689.308 kg/d = 516.05 kg/s
+  = 4.88 times faster than 
+  1 coal/s = 14.24 trees/s
+
+10,000,000,000 acres trees needed to support factories
+
+1 acre coal = 4350 tons = 1977 kg
+1.1 trillion tons of coal left = 252,873,563.218 acres
+would take 54,750 days = .0002165 d/acre = 4618.695 acre/d = 9,131,160.447 kg/d = 36.24 kg/s
+/ 1.5 trillion / 4350 = 82,125 d
