@@ -46,13 +46,13 @@ $(function() {
     };
     
     var planetary_resources = getSavedValue(STORAGE_KEY.PLANET_RESOURCES) || {
-        wood: .0145,     // 14.5 billion
-        coal: 125000000000000, // 1.25 trillion
-        iron: 25000000000,
-        copper: 20000000000,
-        stone: 100000000,
-        oil: 100000000,
-        uranium: 1000000
+        wood:    725000000000,      // 14,500,000,000 acres * 50 trees/acre
+        coal:    1360000000000000,    // 345,000,000 acres * 3954545.5 kg/acre
+        iron:    25000000000000,    //
+        copper:  20000000000000,    //
+        stone:   100000000000000,   //
+        oil:     300000000000,      //
+        uranium: 1000000000         //
     };
     
     var player_resources = getSavedValue(STORAGE_KEY.PLAYER_RESOURCES) || {

@@ -22,7 +22,15 @@ factories = .317 kg/s
 
 10,000,000,000 acres trees needed to support factories
 
-1 acre coal = 4350 tons = 1977 kg
+1 acre coal = 4350 tons = 1977 kg // 3954545.5 kg
 1.1 trillion tons of coal left = 252,873,563.218 acres
 would take 54,750 days = .0002165 d/acre = 4618.695 acre/d = 9,131,160.447 kg/d = 36.24 kg/s
 / 1.5 trillion / 4350 = 82,125 d
+
+1.5t / 4350 = 344,827,586 acres start
+345 m acres coal = 1,364,318,197,500,000 kg
+
+
+
+earth is 123 b acres
+    37 b acres land
