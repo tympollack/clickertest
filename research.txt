@@ -34,3 +34,36 @@ would take 54,750 days = .0002165 d/acre = 4618.695 acre/d = 9,131,160.447 kg/d 
 
 earth is 123 b acres
     37 b acres land
+
+oil - have used 944 b barrels, still 1.5 t barrels left
+
+material densities - https://www.simetric.co.uk/si_materials.htm
+coal        1346 kg/m3  1 coal
+copper      2265         .594
+iron        2500         .538
+uranium     5145         .262
+stone       2515         .535
+oil         881         1.528
+lead?       7500         .179
+ice?        919         1.465
+
+
+old
+wood:    725000000000,        // 14,500,000,000 acres * 50 trees/acre
+        coal:    1360000000000000,    // 345,000,000 acres * 3954545.5 kg/acre
+        iron:    732000000000000,     //
+        copper:  808000000000000,     //
+        stone:   728000000000000,     //
+        oil:     2080000000000000,    //
+        uranium: 356000000000000      //
+            // lead: 243000000000000
+            // ice:  1990000000000000
+
+in earth's crust - https://en.wikipedia.org/wiki/Abundances_of_the_elements_(data_page)
+                 - https://en.wikipedia.org/wiki/Abundance_of_elements_in_Earth%27s_crust
+iron        .0563       281.5       2,083,100,000   6,924,900,000
+carbon      .0002       1           7,400,000       24,600,000
+copper      .00006      .3          2,220,000       7,380,000
+uranium     .0000027    .0135       99,900          332,100
+stone                                               6,886,285,316
+oil                                 23,114,355      76,839,613

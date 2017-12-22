@@ -37,8 +37,8 @@ $(function() {
     };
     
     var planetary_tiles = getSavedValue(STORAGE_KEY.PLANET_TILES) || {
-        total: 50000,
-        water: 15000,
+        total: 123000000000, // 123 b acres
+        water: 86000000000, // 86 b acres
         pollution: 0,
         waste: 0,
         logistics: 0,
@@ -46,13 +46,13 @@ $(function() {
     };
     
     var planetary_resources = getSavedValue(STORAGE_KEY.PLANET_RESOURCES) || {
-        wood:    725000000000,      // 14,500,000,000 acres * 50 trees/acre
-        coal:    1360000000000000,    // 345,000,000 acres * 3954545.5 kg/acre
-        iron:    25000000000000,    //
-        copper:  20000000000000,    //
-        stone:   100000000000000,   //
-        oil:     300000000000,      //
-        uranium: 1000000000         //
+        wood:    14500000000,
+        coal:       24600000,
+        iron:     6930000000,
+        copper:      7380000,
+        stone:    6890000000,
+        oil:        76800000,
+        uranium:      332000
     };
     
     var player_resources = getSavedValue(STORAGE_KEY.PLAYER_RESOURCES) || {
@@ -2222,9 +2222,9 @@ $(function() {
         var cost = obj.cost;
         var oldAmount = obj.amount || 0;
         obj.amount++;
-        multiplier = m ** obj.amount;
+        multiplier = m ^ obj.amount;
         doForKeys(cost, function(key) {
-            var origCost = cost[key] / m ** oldAmount;
+            var origCost = cost[key] / m ^ oldAmount;
             cost[key] = origCost * multiplier;
         });
     }
