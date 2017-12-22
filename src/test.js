@@ -30,11 +30,15 @@ $(function() {
     var timer = null;
     
     var STORAGE_KEY = {
+        DISCOVERED_TILES: 'discoveredTiles',
+        NEW_GAME: 'newGame',
         PLANET_TILES: 'planetTiles',
         PLANET_RESOURCES: 'planetResources',
         PLAYER_RESOURCES: 'playerResources',
         PLAYER_OBJECTS: 'playerObjects'
     };
+
+    var isNewGame = !!getSavedValue(STORAGE_KEY.PLANET_TILES) || true;
     
     var planetary_tiles = getSavedValue(STORAGE_KEY.PLANET_TILES) || {
         total: 123000000000, // 123 b acres
@@ -53,6 +57,18 @@ $(function() {
         stone:    6890000000,
         oil:        76800000,
         uranium:      332000
+    };
+
+    var discovered_tiles = getSavedValue(STORAGE_KEY.DISCOVERED_TILES) || {
+        wood: 0,
+        coal: 0,
+        iron: 0,
+        copper: 0,
+        stone: 0,
+        oil: 0,
+        uranium: 0,
+        water: 0,
+        land: 0
     };
     
     var player_resources = getSavedValue(STORAGE_KEY.PLAYER_RESOURCES) || {
@@ -1869,10 +1885,11 @@ $(function() {
     };
     
     function doForKeys(obj, func) {
-        var i, len;
+        var i, len, key;
         var keys = Object.keys(obj);
         for (i = 0, len = keys.length; i < len; i++) {
-            func(keys[i]);
+            key = keys[i];
+            func(key, obj[key]);
         }
     }
     
@@ -1886,8 +1903,8 @@ $(function() {
     
     function saveInstanceData() {
         var buildings = {};
-        doForKeys(building_objects, function(key) {
-            buildings[key] = { amount: building_objects[key].amount, cost: building_objects[key].cost };
+        doForKeys(building_objects, function(key, value) {
+            buildings[key] = { amount: value.amount, cost: value.cost };
         });
         localStorage[STORAGE_KEY.PLAYER_OBJECTS] = JSON.stringify(buildings);
         
@@ -1898,20 +1915,25 @@ $(function() {
     
     function updatePlanetInfo() {
         var planetTilesDiv = $('#planet-tiles');
+        var discoveredTilesDiv = $('#discovered-tiles');
         var planetResourcesDiv = $('#planet-resources');
         
-        planetTilesDiv.add(planetResourcesDiv).empty();
+        planetTilesDiv.add(discoveredTilesDiv).add(planetResourcesDiv).empty();
         
-        doForKeys(planetary_tiles, function(key) {
-            var html = '<div>' + key + ': ' + planetary_tiles[key] + '</div>';
+        doForKeys(planetary_tiles, function(key, value) {
+            var html = '<div>' + key + ': ' + value + '</div>';
             planetTilesDiv.append(html);
         });
+
+        doForKeys(discovered_tiles, function(key, value) {
+            var html = '<div>' + key + ': ' + value + '</div>';
+            discoveredTilesDiv.append(html);
+        });
+        discoveredTilesDiv.append('<div>usable remaining: ' + getTotalUsuableTiles() + '</div>');
+        discoveredTilesDiv.append('<div>storage space: ' + getTotalStorageSpace() + '</div>');
         
-        planetTilesDiv.append('<div>usable remaining: ' + getTotalUsuableTiles() + '</div>');
-        planetTilesDiv.append('<div>storage space: ' + getTotalStorageSpace() + '</div>');
-        
-        doForKeys(planetary_resources, function(key) {
-            var html = '<div>' + key + ': ' + planetary_resources[key] + '</div>';
+        doForKeys(planetary_resources, function(key, value) {
+            var html = '<div>' + key + ': ' + value + '</div>';
             planetResourcesDiv.append(html);
         });
     }
@@ -1926,18 +1948,17 @@ $(function() {
             }
         }
         
-        doForKeys(nonAccumulativeResources, function(resourceKey) {
+        doForKeys(nonAccumulativeResources, function(resourceKey, value) {
             var button = $(ID_PREFIX.RESOURCE_BUTTON + resourceKey);
-            changeButton(button, nonAccumulativeResources[resourceKey]);
+            changeButton(button, value);
         });
         
-        doForKeys(player_resources, function(resourceKey) {
+        doForKeys(player_resources, function(resourceKey, value) {
             var button = $(ID_PREFIX.RESOURCE_BUTTON + resourceKey);
-            var amount = roundTo(player_resources[resourceKey] || 0, 2);
+            var amount = roundTo(value || 0, 2);
             var totalGenerated = 0;
-            doForKeys(building_objects, function(objKey) {
-                var effObjQuant = getEffectiveObjectQuantity(objKey);
-                var obj = building_objects[objKey];
+            doForKeys(building_objects, function(objKey, obj) {
+                var effObjQuant = getEffectiveObjectQuantity(obj);
                 var objectProduction = (obj.produces[resourceKey] || 0) * obj.efficiency;
                 var objectDrain = (obj.drain[resourceKey] || 0);
                 totalGenerated += (objectProduction - objectDrain) * effObjQuant / (obj.period || 1);
@@ -1960,10 +1981,9 @@ $(function() {
         for (i = 0, len = manualResourceButtons.length; i < len; i++) {
             button = $(manualResourceButtons[i]);
             fromResources = fromResourceMap[button[0].innerText.split('-')[0].trim()] || {};
-            doForKeys(fromResources, function(key) {
-                if (player_resources[key] < fromResources[key]) {
+            doForKeys(fromResources, function(key, value) {
+                if (player_resources[key] < value) {
                     button.addClass('disabled');
-                    return;
                 }
             });
         }
@@ -2006,14 +2026,14 @@ $(function() {
             fromResources[resourceKey] = 1;
         }
         
-        doForKeys(fromResources, function(fromResourceKey) {
-            var max = Math.floor(player_resources[fromResourceKey] / fromResources[fromResourceKey]);
+        doForKeys(fromResources, function(fromResourceKey, value) {
+            var max = Math.floor(player_resources[fromResourceKey] / value);
             amount = Math.min(amount, max, harvestAmount);
         });
         
         player_resources[resourceKey] = (player_resources[resourceKey] || 0) + amount;
-        doForKeys(fromResources, function(fromResourceKey) {
-            var resourceAmount = amount * fromResources[fromResourceKey];
+        doForKeys(fromResources, function(fromResourceKey, value) {
+            var resourceAmount = amount * value;
             player_resources[fromResourceKey] -= resourceAmount;
         });
     }
@@ -2036,12 +2056,11 @@ $(function() {
     function autoHarvestResources() {
         doForKeys(nonAccumulativeResources, function(resourceKey) {
             var total = 0;
-            doForKeys(building_objects, function(objKey) {
+            doForKeys(building_objects, function(objKey, obj) {
                 var effObjQuant, multiplier;
-                var obj = building_objects[objKey];
                 var production = (obj.produces || {})[resourceKey] || 0;
                 if (production) {
-                    effObjQuant = getEffectiveObjectQuantity(objKey);
+                    effObjQuant = getEffectiveObjectQuantity(obj);
                     multiplier = effObjQuant * obj.efficiency;
                     total += multiplier * production;
                 }
@@ -2051,12 +2070,11 @@ $(function() {
         
         
         doForKeys(nonAccumulativeResources, function(resourceKey) {
-            doForKeys(building_objects, function(objKey) {
+            doForKeys(building_objects, function(objKey, obj) {
                 var effObjQuant, multiplier;
-                var obj = building_objects[objKey];
                 var drain = (obj.drain || {})[resourceKey] || 0;
                 if (drain) {
-                    effObjQuant = getEffectiveObjectQuantity(objKey);
+                    effObjQuant = getEffectiveObjectQuantity(obj);
                     multiplier = effObjQuant * obj.efficiency;
                     nonAccumulativeResources[resourceKey] -= multiplier * drain;                    
                 }
@@ -2064,9 +2082,8 @@ $(function() {
         });
         
         
-        doForKeys(building_objects, function(objKey) {
+        doForKeys(building_objects, function(objKey, obj) {
             var effObjQuant, multiplier;
-            var obj = building_objects[objKey];
             var production = obj.produces;
             var amount = obj.amount;
             if (manualObjects.indexOf(objKey) > -1) {
@@ -2078,11 +2095,11 @@ $(function() {
                 return;
             }
             
-            effObjQuant = getEffectiveObjectQuantity(objKey);
+            effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
             
-            doForKeys(production, function(resourceKey) {
-                var productionAmount = production[resourceKey] * multiplier;
+            doForKeys(production, function(resourceKey, value) {
+                var productionAmount = value * multiplier;
                 if (amount && !$(ID_PREFIX.RESOURCE_BUTTON + resourceKey).length) {
                     createResourceButton(resourceKey);
                 }
@@ -2097,18 +2114,16 @@ $(function() {
         });
         
         
-        doForKeys(building_objects, function(objKey) {
-            var drain, effObjQuant, multiplier;
-            var obj = building_objects[objKey];
+        doForKeys(building_objects, function(objKey, obj) {
+            var effObjQuant, multiplier;
             if (manualObjects.indexOf(objKey) > -1) return;
             
-            drain = obj.drain;
-            effObjQuant = getEffectiveObjectQuantity(objKey);
+            effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
             
             if (multiplier) {
-                doForKeys(drain, function(resourceKey) {
-                    var drainAmount = roundTo(drain[resourceKey] * multiplier, 2);
+                doForKeys(obj.drain, function(resourceKey, value) {
+                    var drainAmount = roundTo(value * multiplier, 2);
                     if (!nonAccumulativeResources.hasOwnProperty(resourceKey)) {
                         player_resources[resourceKey] -= Math.min(player_resources[resourceKey], drainAmount);
                     }
@@ -2122,28 +2137,25 @@ $(function() {
             ? player_resources[resourceKey] + amount : amount;
     }
     
-    function getEffectiveObjectQuantity(objKey) {
-        var eff, drain, production, period, totalProductionAmount;
-        var obj = building_objects[objKey];
-        var amount = obj.amount;
-        if (!amount) return 0;
+    function getEffectiveObjectQuantity(obj) {
+        var period, totalProductionAmount, eff;
+        obj = typeof obj === 'object' ? obj : building_objects[obj];
+        eff = obj.amount;
+        if (!eff) return 0;
         
-        eff = amount;
-        drain = obj.drain;
-        production = obj.produces;
         period = obj.period || 1;
         totalProductionAmount = 0;
         
-        doForKeys(production, function(resourceKey) {
+        doForKeys(obj.produces, function(resourceKey, value) {
             if (!nonAccumulativeResources.hasOwnProperty(resourceKey)) {
-                totalProductionAmount += production[resourceKey] / period;
+                totalProductionAmount += value / period;
             }
         });
         
-        doForKeys(drain, function(resourceKey) {
+        doForKeys(obj.drain, function(resourceKey, value) {
             var maxDrain = nonAccumulativeResources.hasOwnProperty(resourceKey)
                 ? nonAccumulativeResources[resourceKey]
-                : (player_resources[resourceKey] || 0) / (drain[resourceKey] / period);
+                : (player_resources[resourceKey] || 0) / (value / period);
             eff = Math.min(eff, maxDrain);
             if (!eff) return 0;
         });
@@ -2159,8 +2171,7 @@ $(function() {
         var total = 0;
         var numLogBots = getEffectiveObjectQuantity('logisticsRobot');
         var logBotEffectiveness = numLogBots * 25;
-        doForKeys(building_objects, function(key) {
-            var obj = building_objects[key];
+        doForKeys(building_objects, function(key, obj) {
             total += obj.amount * obj.size.logistics;
         });
         return Math.max(0, total - logBotEffectiveness);
@@ -2171,17 +2182,17 @@ $(function() {
         total += building_objects.storageCrateWood.amount * 1600;
         total += building_objects.storageCrateIron.amount * 3200;
         total += building_objects.storageCrateSteel.amount * 4800;
-        doForKeys(player_resources, function(key) {
-            total -= player_resources[key] || 0;
-        })
+        doForKeys(player_resources, function(key, value) {
+            total -= value || 0;
+        });
         return roundTo(total, 2);
     }
     
     function canPurchase(obj) {
         function hasResources(cost) {
             var ret = true;
-            doForKeys(cost, function(key) {
-                if ((player_resources[key] || 0) < cost[key]) {
+            doForKeys(cost, function(key, value) {
+                if ((player_resources[key] || 0) < value) {
                     ret = false;
                 }
             });
@@ -2197,17 +2208,23 @@ $(function() {
     }
     
     function getTotalUsuableTiles() {
-        return planetary_tiles.total
-            - planetary_tiles.water
-            - planetary_tiles.waste
-            - planetary_tiles.buildings
-            - planetary_resources.wood
+        // return planetary_tiles.total
+        //     - planetary_tiles.water
+        //     - planetary_tiles.waste
+        //     - planetary_tiles.buildings
+        //     - planetary_resources.wood
+        //     - getTotalLogisticsSpace();
+        return discovered_tiles.total
+            - discovered_tiles.water
+            - discovered_tiles.waste
+            - discovered_tiles.buildings
+            - discovered_tiles.wood
             - getTotalLogisticsSpace();
     }
     
     function decreasePlayerResourcesForObject(cost) {
-        doForKeys(cost, function(key) {
-            player_resources[key] -= Math.floor(cost[key]);
+        doForKeys(cost, function(key, value) {
+            player_resources[key] -= Math.floor(value);
         });
     }
     
@@ -2223,21 +2240,19 @@ $(function() {
         var oldAmount = obj.amount || 0;
         obj.amount++;
         multiplier = m ^ obj.amount;
-        doForKeys(cost, function(key) {
-            var origCost = cost[key] / m ^ oldAmount;
+        doForKeys(cost, function(key, value) {
+            var origCost = value / m ^ oldAmount;
             cost[key] = origCost * multiplier;
         });
     }
     
     function updateObjects() {
-        doForKeys(building_objects, function(key) {
-            var groupDiv;
-            var obj = building_objects[key];
+        doForKeys(building_objects, function(key, obj) {
             var amount = obj.amount;
             var efficiency = obj.efficiency;
             var produces = obj.produces;
             var total = amount * efficiency * (produces[Object.keys(produces)[0]] || 1);
-            var id = ID_PREFIX.OBJECT_AREA + key
+            var id = ID_PREFIX.OBJECT_AREA + key;
             var div = $(id);
             var canPur = canPurchase(obj);
             
@@ -2250,8 +2265,8 @@ $(function() {
             div.find('.production').html(total);
             div.toggleClass('can-purchase', canPur);
             
-            doForKeys(obj.cost, function(key) {
-                div.find('.cost.' + key).html(Math.floor(obj.cost[key]));
+            doForKeys(obj.cost, function(key, value) {
+                div.find('.cost.' + key).html(Math.floor(value));
             });
         }); 
     }
@@ -2294,6 +2309,18 @@ $(function() {
         groupDiv.append(div);
         return div;
     }
+
+    function discoverTiles(numTiles) {
+        var i;
+        for (i = 0; i < numTiles; i++) {
+            Math.random(100);
+        }
+    }
+
+    function initGame() {
+        if (!isNewGame) return;
+        discoverTiles(5000);
+    }
     
     function initView() {
         updatePlanetInfo();
@@ -2302,8 +2329,8 @@ $(function() {
             createResourceButton(key);
         });
         
-        doForKeys(building_objects, function(key) {
-            addObjectGroupIfNeeded(key, building_objects[key]);
+        doForKeys(building_objects, function(key, obj) {
+            addObjectGroupIfNeeded(key, obj);
         });
         
         $('#clear-timer').on('click', function() {
@@ -2318,8 +2345,8 @@ $(function() {
         });
         
         $('#erase-data').on('click', function() {
-            doForKeys(STORAGE_KEY, function(key) {
-                delete localStorage[STORAGE_KEY[key]];
+            doForKeys(STORAGE_KEY, function(key, value) {
+                delete localStorage[value];
             });
         });
         
@@ -2328,9 +2355,9 @@ $(function() {
     
     function applySavedBuildingAmounts() {
         var buildings = getSavedValue(STORAGE_KEY.PLAYER_OBJECTS) || {};
-        doForKeys(buildings, function(objKey) {
-            building_objects[objKey].amount = buildings[objKey].amount;
-            building_objects[objKey].cost = buildings[objKey].cost;
+        doForKeys(buildings, function(objKey, obj) {
+            building_objects[objKey].amount = obj.amount;
+            building_objects[objKey].cost = obj.cost;
         });
     }
     
@@ -2346,8 +2373,8 @@ $(function() {
     function createBuildingObject(key) {
         function generateCostHtml(cost, cssClass) {
             var vars = [];
-            doForKeys(cost, function(key) {
-                vars.push(key + ': <span class="' + cssClass + ' ' + key + '">' + cost[key] + '</span>');
+            doForKeys(cost, function(key, value) {
+                vars.push(key + ': <span class="' + cssClass + ' ' + key + '">' + value + '</span>');
             });
             return vars.join(', ');
         }
@@ -2359,8 +2386,8 @@ $(function() {
         var id = ID_PREFIX.OBJECT_AREA.substring(1) + key;
         var objProduction = {};
         
-        doForKeys(obj.produces, function(key) {
-            objProduction[key] = obj.produces[key] * obj.efficiency * obj.amount;
+        doForKeys(obj.produces, function(key, value) {
+            objProduction[key] = value * obj.efficiency * obj.amount;
         });
         
         html = '<div class="object-area" id="' + id + '">'
@@ -2374,6 +2401,7 @@ $(function() {
     }
     
     function init() {
+        initGame();
         initView();
         updateUiValues();
         timer = setInterval(function() {

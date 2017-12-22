@@ -1,4 +1,4 @@
-#planet-tiles, #planet-resources {
+#planet-tiles, #discovered-tiles, #planet-resources {
     display: inline-block;
     width: 250px;
     border: 1px dotted cornflowerblue;
