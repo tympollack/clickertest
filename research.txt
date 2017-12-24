@@ -35,22 +35,28 @@ would take 54,750 days = .0002165 d/acre = 4618.695 acre/d = 9,131,160.447 kg/d 
 earth is 123 b acres
     37 b acres land
 
+earth radius = 3959 mi = 197,000,000 mi2
+smallest planet radius = .3 earth = 17,600,000 mi2 = .08934 times earth
+largest planet = 47,400,000,000 mi2 = 240.61 times earth
+
 oil - have used 944 b barrels, still 1.5 t barrels left
 
 material densities - https://www.simetric.co.uk/si_materials.htm
-coal        1346 kg/m3  1 coal
-copper      2265         .594
-iron        2500         .538
-uranium     5145         .262
-stone       2515         .535
-oil         881         1.528
-lead?       7500         .179
-ice?        919         1.465
+water       1000 kg/m3
+coal        1346
+copper      2265
+iron        2500
+uranium     5145
+stone       2515
+oil         881
+lead?       7500
+ice?        919
+wood        170-1370
 
 
 old
 wood:    725000000000,        // 14,500,000,000 acres * 50 trees/acre
-        coal:    1360000000000000,    // 345,000,000 acres * 3954545.5 kg/acre
+        coal:    1360000000000000,    // 345,000,000 acres * 3,954,545.5 kg/acre
         iron:    732000000000000,     //
         copper:  808000000000000,     //
         stone:   728000000000000,     //
