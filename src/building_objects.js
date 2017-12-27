@@ -6,8 +6,8 @@ var building_objects = {
         efficiency: 1,
         produces: {},
         cost: {
-            wood: 1,
-            iron: 1
+            wood: .1,
+            iron: .1
         },
         drain: {},
         size: {
@@ -45,10 +45,8 @@ var building_objects = {
         name: 'Discover Land',
         verb: 'Discover',
         amount: 0,
-        efficiency: 1,
-        produces: {
-            discoveredTile: 1000
-        },
+        efficiency: 1000,
+        produces: {},
         cost: {
             wood: .1,
             iron: .1,
@@ -67,13 +65,11 @@ var building_objects = {
         verb: 'Restore',
         amount: 0,
         efficiency: 1,
-        produces: {
-            land: 1
-        },
+        produces: {},
         cost: {
             wood: .1,
             iron: .1,
-            stone: 1
+            stone: .1
         },
         drain: {},
         size: {
@@ -107,6 +103,31 @@ var building_objects = {
         },
         waste: .1,
         pollution: 1,
+        group: 'misc'
+    },
+    radarTowerSmall: {
+        name: 'Radar Tower - Small',
+        verb: 'Discover',
+        period: 5,
+        amount: 0,
+        efficiency: 640,
+        produces: {},
+        cost: {
+            ironPlate: 250,
+            cog: 125,
+            wire: 150,
+            greenChip: 50
+        },
+        drain: {
+            electricity: 25
+        },
+        size: {
+            length: 2,
+            width: 2,
+            logistics: 0
+        },
+        waste: 0,
+        pollution: 0,
         group: 'misc'
     },
     storageCrateWood: {

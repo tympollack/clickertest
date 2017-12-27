@@ -47,14 +47,14 @@ $(function() {
     };
     
     var planetary_resources = getSavedValue(STORAGE_KEY.PLANET_RESOURCES) || {
+        water:   86000000000,
         wood:    14500000000,
-        coal:       24600000,
         iron:     6930000000,
-        copper:      7380000,
         stone:    6890000000,
         oil:        76800000,
-        uranium:      332000,
-        water:   86000000000
+        coal:       24600000,
+        copper:      7380000,
+        uranium:      332000
     };
 
     var RESOURCE_WEIGHT_BY_ACRE = {
@@ -233,15 +233,23 @@ $(function() {
     
     function addObjectAreaListeners() {
         $('.object-area').off('click').on('click', function() {
+            var amount;
             var objectKey = this.id.split('-')[1];
             var obj = building_objects[objectKey];
-            if (!canPurchase(obj)) {
-                return;
-            }
-            
+            if (!canPurchase(obj)) return;
+
             decreasePlayerResourcesForObject(obj.cost);
             decreaseUsableTileSpaceForObject(obj.size);
             increaseObjectCount(obj);
+
+            if (objectKey === 'explore') {
+                amount = Math.min(obj.efficiency, planetary_tiles.total);
+                discoverTiles(amount);
+            } else if (objectKey === 'restoreLand') {
+                amount = Math.floor(Math.min(obj.efficiency, discovered_tiles.damagedLand));
+                discovered_tiles.damagedLand -= amount;
+                discovered_tiles.land += amount;
+            }
             
             updateUiValues();
         });
@@ -442,8 +450,15 @@ $(function() {
             var tileSize = size.length * size.width;
             return getTotalUsuableTiles() >= tileSize + size.logistics;
         }
+
+        function otherConditions() {
+            if (obj.name === 'Restore Land') {
+                return discovered_tiles.damagedLand >= 1;
+            }
+            return true;
+        }
         
-        return hasSpace(obj.size) && hasResources(obj.cost);
+        return hasSpace(obj.size) && hasResources(obj.cost) && otherConditions();
     }
     
     function getTotalUsuableTiles() {
@@ -472,7 +487,7 @@ $(function() {
     
     function increaseObjectCount(obj) {
         var multiplier;
-        var m = 1.1665;
+        var m = 1.15;
         var cost = obj.cost;
         var oldAmount = obj.amount || 0;
         multiplier = Math.pow(m, ++obj.amount);
@@ -490,16 +505,15 @@ $(function() {
             var total = amount * efficiency * (produces[Object.keys(produces)[0]] || 1);
             var id = ID_PREFIX.OBJECT_AREA + key;
             var div = $(id);
-            var canPur = canPurchase(obj);
             
-            if ((amount || canPur) && !div.length) {
+            if (!div || !div.length) {
                 div = addObjectGroupIfNeeded(key, obj);
             }
             
             div.find('.efficiency').html(efficiency);
             div.find('.amount').html(amount);
             div.find('.production').html(total);
-            div.toggleClass('can-purchase', canPur);
+            div.toggleClass('can-purchase', canPurchase(obj));
             
             doForKeys(obj.cost, function(key, value) {
                 div.find('.cost.' + key).html(Math.floor(value));
@@ -508,13 +522,11 @@ $(function() {
     }
     
     function addObjectGroupIfNeeded(key, obj) {
-        var div, group, groupDiv, id, i, len, otherGroupKey, otherGroupDiv, found;
-        if (!obj.amount && !canPurchase(obj)) return;
-        
-        div = createBuildingObject(key);
-        group = obj.group;
-        id = ID_PREFIX.OBJECT_GROUP + group;
-        groupDiv = $(id);
+        var i, len, otherGroupKey, otherGroupDiv, found;
+        var div = createBuildingObject(key);
+        var group = obj.group;
+        var id = ID_PREFIX.OBJECT_GROUP + group;
+        var groupDiv = $(id);
         if (!groupDiv.length) {
             groupDiv = $('<div id="' + id.substring(1) + '" class="object-group"></div>');
             found = false;
