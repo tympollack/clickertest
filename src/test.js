@@ -102,11 +102,13 @@ $(function() {
         greenChip: { ironPlate: 1, wire: 3 }
     };
     
-    var groupOrder = ['coalDrill', 'electricDrill', 'miningRobotics', 'smelter', 'smelterAdvanced', 'smelterElectric', 'research',
-                      't1Production', 't2Production', 't3Production', 'robotics', 'liquid', 'electricity', 'manualObjects', 'misc'];
+    var groupOrder = ['manualObjects', 'misc', 'coalDrill', 'electricDrill', 'miningRobotics', 'smelter', 'smelterAdvanced', 'smelterElectric', 'research',
+                      't1Production', 't2Production', 't3Production', 'robotics', 'liquid', 'electricity', 'storage'];
     
     var manualResources = ['wood', 'coal', 'iron', 'copper', 'stone', 'cog', 'pipe', 'wire', 'rod', 'greenChip'];
     var manualObjects = ['pickaxe', 'handProcessor', 'explore', 'restoreLand'];
+    var radarObjects = ['radarTowerSmall'];
+    var excavationObjects = ['excavator1'];
 
     var ID_PREFIX = {
         RESOURCE_BUTTON: '#btn-',
@@ -165,7 +167,7 @@ $(function() {
             var html = '<div>' + key + ': ' + val + '</div>';
             discoveredTilesDiv.append(html);
         });
-        discoveredTilesDiv.append('<div>usable remaining: ' + getTotalUsuableTiles() + '</div>');
+        discoveredTilesDiv.append('<div>usable remaining: ' + Math.floor(getTotalUsableTiles()) + '</div>');
         discoveredTilesDiv.append('<div>storage space: ' + getTotalStorageSpace() + '</div>');
         
         doForKeys(planetary_resources, function(key, value) {
@@ -275,8 +277,8 @@ $(function() {
         }
         
         doForKeys(fromResources, function(fromResourceKey, value) {
-            var max = Math.floor(player_resources[fromResourceKey] / value);
-            amount = Math.min(amount, max, harvestAmount);
+            var max = player_resources[fromResourceKey] / value;
+            amount = Math.floor(Math.min(amount, max, harvestAmount));
         });
         
         player_resources[resourceKey] = (player_resources[resourceKey] || 0) + amount;
@@ -286,16 +288,16 @@ $(function() {
     }
     
     function manuallyHarvestResource(resourceKey) {
-        var harvestAmount, obj;
+        var harvestAmount, obj, func;
         if (planetary_resources.hasOwnProperty(resourceKey)) {
             obj = building_objects.pickaxe;
-            harvestAmount = obj.amount * obj.efficiency;
-            harvestPlanetaryResource(resourceKey, harvestAmount);
+            func = harvestPlanetaryResource;
         } else {
             obj = building_objects.handProcessor;
-            harvestAmount = obj.amount * obj.efficiency;
-            harvestProducedResource(resourceKey, harvestAmount);
+            func = harvestProducedResource;
         }
+        harvestAmount = Math.min(obj.amount * obj.efficiency, getTotalStorageSpace());
+        func(resourceKey, harvestAmount);
         
         updateResources();
     }
@@ -318,19 +320,16 @@ $(function() {
         
         doForKeys(nonAccumulativeResources, function(resourceKey) {
             doForKeys(building_objects, function(objKey, obj) {
-                var effObjQuant, multiplier;
                 var drain = (obj.drain || {})[resourceKey] || 0;
                 if (drain) {
-                    effObjQuant = getEffectiveObjectQuantity(obj);
-                    multiplier = effObjQuant * obj.efficiency;
-                    nonAccumulativeResources[resourceKey] -= multiplier * drain;                    
+                    nonAccumulativeResources[resourceKey] -= getEffectiveObjectQuantity(obj) * drain;
                 }
             });
         });
         
         
         doForKeys(building_objects, function(objKey, obj) {
-            var effObjQuant, multiplier;
+            var effObjQuant, multiplier, m;
             var production = obj.produces;
             var amount = obj.amount;
             if (manualObjects.indexOf(objKey) > -1) {
@@ -344,7 +343,17 @@ $(function() {
             
             effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
-            
+
+            if (radarObjects.indexOf(objKey) > -1) {
+                discoverTiles(multiplier);
+                return;
+            }
+            if (excavationObjects.indexOf(objKey) > -1) {
+                m = Math.min(multiplier, discovered_tiles.damagedLand);
+                discovered_tiles.damagedLand -= m;
+                discovered_tiles.land += m;
+            }
+
             doForKeys(production, function(resourceKey, value) {
                 var productionAmount = value * multiplier;
                 if (amount && !$(ID_PREFIX.RESOURCE_BUTTON + resourceKey).length) {
@@ -380,8 +389,7 @@ $(function() {
     }
     
     function addPlayerResources(resourceKey, amount) {
-        player_resources[resourceKey] = player_resources.hasOwnProperty(resourceKey)
-            ? player_resources[resourceKey] + amount : amount;
+        player_resources[resourceKey] = (player_resources[resourceKey] || 0) + amount;
     }
     
     function getEffectiveObjectQuantity(obj) {
@@ -400,14 +408,14 @@ $(function() {
         });
         
         doForKeys(obj.drain, function(resourceKey, value) {
-            var maxDrain = nonAccumulativeResources.hasOwnProperty(resourceKey)
-                ? nonAccumulativeResources[resourceKey]
-                : (player_resources[resourceKey] || 0) / (value / period);
+            var maxDrain;
+            if (!eff) return;
+            maxDrain = nonAccumulativeResources[resourceKey] || player_resources[resourceKey] || 0;
+            maxDrain /= value / period;
             eff = Math.min(eff, maxDrain);
-            if (!eff) return 0;
         });
         
-        if (getTotalStorageSpace() < totalProductionAmount) {
+        if (!eff || getTotalStorageSpace() < totalProductionAmount) {
             return 0;
         }
         
@@ -416,8 +424,10 @@ $(function() {
     
     function getTotalLogisticsSpace() {
         var total = 0;
-        var numLogBots = getEffectiveObjectQuantity('logisticsRobot');
-        var logBotEffectiveness = numLogBots * 25;
+        var facility = building_objects.roboticsFacility;
+        var logBot = building_objects.logisticsRobot;
+        var numLogBots = Math.min(facility.amount * facility.produces.robotSpace, logBot.amount);
+        var logBotEffectiveness = numLogBots * logBot.efficiency;
         doForKeys(building_objects, function(key, obj) {
             total += obj.amount * obj.size.logistics;
         });
@@ -448,7 +458,7 @@ $(function() {
         
         function hasSpace(size) {
             var tileSize = size.length * size.width;
-            return getTotalUsuableTiles() >= tileSize + size.logistics;
+            return getTotalUsableTiles() >= tileSize + size.logistics;
         }
 
         function otherConditions() {
@@ -461,7 +471,7 @@ $(function() {
         return hasSpace(obj.size) && hasResources(obj.cost) && otherConditions();
     }
     
-    function getTotalUsuableTiles() {
+    function getTotalUsableTiles() {
         // return planetary_tiles.total
         //     - planetary_resources.water
         //     - planetary_tiles.waste
@@ -482,15 +492,14 @@ $(function() {
     
     function decreaseUsableTileSpaceForObject(size) {
         planetary_tiles.buildings += size.length * size.width;
-        planetary_tiles.logistics += size.length;
+        planetary_tiles.logistics += size.logistics;
     }
     
     function increaseObjectCount(obj) {
-        var multiplier;
         var m = 1.15;
         var cost = obj.cost;
         var oldAmount = obj.amount || 0;
-        multiplier = Math.pow(m, ++obj.amount);
+        var multiplier = Math.pow(m, ++obj.amount);
         doForKeys(cost, function(key, value) {
             var origCost = value / Math.pow(m, oldAmount);
             cost[key] = origCost * multiplier;
@@ -595,6 +604,7 @@ $(function() {
         if (!isNewGame) return;
         randomizePlanet();
         discoverTiles(STARTING_TILES);
+        planetary_tiles.buildings = 1;
         saveInstanceData();
     }
     

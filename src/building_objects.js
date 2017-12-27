@@ -130,6 +130,32 @@ var building_objects = {
         pollution: 0,
         group: 'misc'
     },
+    excavator1: {
+        name: 'Excavator 1',
+        verb: 'Restore',
+        period: 10,
+        amount: 0,
+        efficiency: 1,
+        produces: {},
+        cost: {
+            ironPlate: 50,
+            steel: 15,
+            cog: 25,
+            wire: 25,
+            greenChip: 10
+        },
+        drain: {
+            coal: 1
+        },
+        size: {
+            length: 0,
+            width: 0,
+            logistics: 0
+        },
+        waste: 0,
+        pollution: 5,
+        group: 'misc'
+    },
     storageCrateWood: {
         name: 'Storage Crate - Wood',
         verb: 'store',
@@ -148,7 +174,7 @@ var building_objects = {
         },
         waste: 0,
         pollution: 0,
-        group: 'misc'
+        group: 'storage'
     },
     storageCrateIron: {
         name: 'Storage Crate - Iron',
@@ -168,7 +194,7 @@ var building_objects = {
         },
         waste: 0,
         pollution: 0,
-        group: 'misc'
+        group: 'storage'
     },
     storageCrateSteel: {
         name: 'Storage Crate - Steel',
@@ -188,7 +214,7 @@ var building_objects = {
         },
         waste: 0,
         pollution: 0,
-        group: 'misc'
+        group: 'storage'
     },
     coalDrillCoal: {
         name: 'Coal-powered Drill',
@@ -1588,7 +1614,7 @@ var building_objects = {
         verb: 'produce',
         period: 0,
         amount: 0,
-        efficiency: 1,
+        efficiency: 25,
         produces: {},
         cost: {
             robotBody: 1,
