@@ -1,4 +1,4 @@
-$(function() {
+$(function($) {
     function roundTo(n, digits) {
         var multiplier;
         var negative = false;
@@ -118,8 +118,9 @@ $(function() {
 
     var timer = null;
     var STARTING_TILES  =         100000;
-    var SMALLEST_PLANET =    11000000000; // 11 billion
-    var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion
+    var SMALLEST_PLANET =    11000000000; // 11 billion acres
+    var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion acres
+    var BUILDING_STATUS = { on: 1, off: 0 };
     
     function doForKeys(obj, func) {
         var i, len, key;
@@ -141,7 +142,11 @@ $(function() {
     function saveInstanceData() {
         var buildings = {};
         doForKeys(building_objects, function(key, value) {
-            buildings[key] = { amount: value.amount, cost: value.cost };
+            buildings[key] = {
+                amount: value.amount,
+                cost: value.cost,
+                status: value.status
+            };
         });
         localStorage[STORAGE_KEY.PLAYER_OBJECTS] = JSON.stringify(buildings);
         localStorage[STORAGE_KEY.PLANET_TILES] = JSON.stringify(planetary_tiles);
@@ -234,7 +239,8 @@ $(function() {
     }
     
     function addObjectAreaListeners() {
-        $('.object-area').off('click').on('click', function() {
+        var objectAreas = $('.object-area');
+        objectAreas.off('click').on('click', function() {
             var amount;
             var objectKey = this.id.split('-')[1];
             var obj = building_objects[objectKey];
@@ -254,6 +260,18 @@ $(function() {
             }
             
             updateUiValues();
+        });
+
+        objectAreas.find('.object-on').on('click', function(e) {
+            var objectKey = $(this).parent()[0].id.split('-')[1];
+            building_objects[objectKey].status = BUILDING_STATUS.on;
+            e.preventDefault();
+        });
+
+        objectAreas.find('.object-off').on('click', function(e) {
+            var objectKey = $(this).parent()[0].id.split('-')[1];
+            building_objects[objectKey].status = BUILDING_STATUS.off;
+            e.preventDefault();
         });
     }
     
@@ -396,7 +414,7 @@ $(function() {
         var period, totalProductionAmount, eff;
         obj = typeof obj === 'object' ? obj : building_objects[obj];
         eff = obj.amount;
-        if (!eff) return 0;
+        if (!eff || !obj.status) return 0;
         
         period = obj.period || 1;
         totalProductionAmount = 0;
@@ -415,7 +433,7 @@ $(function() {
             eff = Math.min(eff, maxDrain);
         });
         
-        if (!eff || getTotalStorageSpace() < totalProductionAmount) {
+        if (!eff || (!nonAccumulativeResources && getTotalStorageSpace() <= totalProductionAmount)) {
             return 0;
         }
         
@@ -642,8 +660,10 @@ $(function() {
     function applySavedBuildingAmounts() {
         var buildings = getSavedValue(STORAGE_KEY.PLAYER_OBJECTS) || {};
         doForKeys(buildings, function(objKey, obj) {
-            building_objects[objKey].amount = obj.amount;
-            building_objects[objKey].cost = obj.cost;
+            var buildingObject = building_objects[objKey];
+            buildingObject.amount = obj.amount;
+            buildingObject.cost = obj.cost;
+            buildingObject.status = obj.status;
         });
     }
     
@@ -667,7 +687,9 @@ $(function() {
         
         var html, div;
         var obj = building_objects[key];
-        var period = manualObjects.indexOf(key) > -1 ? 'click' : 'second';
+        var isManualObject = manualObjects.indexOf(key) > -1;
+        var period = isManualObject ? 'click' : 'second';
+        var onOffBtns = isManualObject ? '' : '<div><button class="btn btn-default object-on">On</button></div><div><button class="btn btn-default object-off">Off</button></div>';
         var id = ID_PREFIX.OBJECT_AREA.substring(1) + key;
         var objProduction = {};
         
@@ -676,11 +698,12 @@ $(function() {
         });
         
         html = '<div class="object-area" id="' + id + '">'
-                 + '<div>' + obj.name + '</div>'
-                 + '<div>Cost: ' + generateCostHtml(obj.cost, 'cost') + '</div>'
-                 + '<div>Drain: ' + generateCostHtml(obj.drain, 'drain') + '</div>'
-                 + '<div><span class="amount"></span> - ' + generateCostHtml(objProduction, 'production') + ' per '+ period + '</div>'
-                 + '</div>';
+             + '<div class="object-switch">' + onOffBtns + '</div>'
+             + '<div>' + obj.name + '</div>'
+             + '<div>Cost: ' + generateCostHtml(obj.cost, 'cost') + '</div>'
+             + '<div>Drain: ' + generateCostHtml(obj.drain, 'drain') + '</div>'
+             + '<div><span class="amount"></span> - ' + generateCostHtml(objProduction, 'production') + ' per '+ period + '</div>'
+             + '</div>';
         div = $(html);
         return div;
     }

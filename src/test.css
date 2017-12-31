@@ -26,6 +26,14 @@
     text-align: left;
 }
 
+.object-switch {
+    float: right;
+}
+
+.object-switch .btn{
+    font-size: smaller;
+    padding: .175rem .75rem;
+}
 
 .object-group {
     overflow-x: auto;
