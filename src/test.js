@@ -214,7 +214,7 @@ $(function($) {
     
     function addListeners() {
         addManualResourceListeners();
-        addObjectAreaListeners();
+        // addObjectAreaListeners();
     }
     
     function addManualResourceListeners() {
@@ -237,33 +237,57 @@ $(function($) {
             manuallyHarvestResource(key);
         });
     }
-    
+
+    function buyObject(obj) {
+        decreasePlayerResourcesForObject(obj.cost);
+        decreaseUsableTileSpaceForObject(obj.size);
+        increaseObjectCount(obj);
+    }
+
+    function sellObject(obj) {
+        var multiplier;
+        var m = 1.15;
+        var cost = obj.cost;
+        var size = obj.size;
+        var oldAmount = obj.amount || 0;
+        if (!oldAmount) return;
+
+        planetary_tiles.buildings -= size.length * size.width;
+        planetary_tiles.logistics -= size.logistics;
+        multiplier = Math.pow(m, --obj.amount);
+        doForKeys(cost, function(key, value) {
+            var origCost = value / Math.pow(m, oldAmount);
+            cost[key] = origCost * multiplier;
+            player_resources[key] += cost[key] / 2;
+        });
+    }
+
     function addObjectAreaListeners() {
+        function getObjectKey(_this) {
+            return _this.closest('.object-area')[0].id.split('-')[1];
+        }
+
         function onSwitchClick(_this) {
             var areaDiv = _this.closest('.object-area');
-            var objectKey = areaDiv[0].id.split('-')[1];
             var otherSelector = _this[0].innerText === 'On' ? offClass : onClass;
             var addClass = otherSelector === offClass ? 'btn-success' : 'btn-danger';
             var removeClass = otherSelector === offClass ? 'btn-danger' : 'btn-success';
             var status = otherSelector === offClass ? 'on' : 'off';
             areaDiv.find('.' + otherSelector).removeClass(removeClass);
             _this.addClass(addClass);
-            building_objects[objectKey].status = BUILDING_STATUS[status];
+            building_objects[getObjectKey(_this)].status = BUILDING_STATUS[status];
         }
 
         var objectAreas = $('.object-area');
         var onClass = 'object-on';
         var offClass = 'object-off';
-        objectAreas.off('click').on('click', function(e) {
+        objectAreas.on('click', function(e) {
             var amount;
             var objectKey = this.id.split('-')[1];
             var obj = building_objects[objectKey];
             if (e.target.classList.contains('btn') || !canPurchase(obj)) return;
 
-            decreasePlayerResourcesForObject(obj.cost);
-            decreaseUsableTileSpaceForObject(obj.size);
-            increaseObjectCount(obj);
-
+            buyObject(obj);
             if (objectKey === 'explore') {
                 amount = Math.min(obj.efficiency, planetary_tiles.total);
                 discoverTiles(amount);
@@ -276,13 +300,13 @@ $(function($) {
             updateUiValues();
         });
 
-        objectAreas.find('.object-on').off('click').on('click', function(e) {
+        objectAreas.find('.object-on, .object-off').on('click', function(e) {
             onSwitchClick($(this));
             e.preventDefault();
         });
 
-        objectAreas.find('.object-off').off('click').on('click', function(e) {
-            onSwitchClick($(this));
+        objectAreas.find('.object-sell').on('click', function(e) {
+            sellObject(building_objects[getObjectKey($(this))]);
             e.preventDefault();
         });
     }
@@ -516,7 +540,7 @@ $(function($) {
     
     function decreasePlayerResourcesForObject(cost) {
         doForKeys(cost, function(key, value) {
-            player_resources[key] -= Math.floor(value);
+            player_resources[key] -= value;
         });
     }
     
@@ -710,7 +734,8 @@ $(function($) {
         });
         
         html = '<div class="object-area" id="' + id + '">'
-             + '<div class="object-switch">' + onOffBtns + '</div>'
+             + '<div class="object-switch">' + onOffBtns
+             + '<div><button class="btn btn-default object-sell">Sell</button></div></div>'
              + '<div>' + obj.name + '</div>'
              + '<div>Cost: ' + generateCostHtml(obj.cost, 'cost') + '</div>'
              + '<div>Drain: ' + generateCostHtml(obj.drain, 'drain') + '</div>'
@@ -724,6 +749,7 @@ $(function($) {
         initGame();
         initView();
         updateUiValues();
+        addObjectAreaListeners();
         timer = setInterval(function() {
             autoHarvestResources();
             updateUiValues();

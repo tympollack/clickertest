@@ -2,11 +2,12 @@
     display: inline-block;
     width: 250px;
     border: 1px dotted cornflowerblue;
-    margin: 25px 0 0 0px;
+    margin: 25px 0 0 0;
 }
 
 #objects {
-    margin-left: 300px;
+    overflow-y: auto;
+    max-height: 500px;
 }
 
 #left-div {
@@ -14,10 +15,7 @@
     height: 100%;
     padding: 0 25px;
     float: left;
-}
-
-#center-div {
-    display: block;
+    overflow-y: auto;
 }
 
 #resources button, #non-accumulative-resources button {
