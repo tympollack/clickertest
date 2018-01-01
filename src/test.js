@@ -239,12 +239,26 @@ $(function($) {
     }
     
     function addObjectAreaListeners() {
+        function onSwitchClick(_this) {
+            var areaDiv = _this.closest('.object-area');
+            var objectKey = areaDiv[0].id.split('-')[1];
+            var otherSelector = _this[0].innerText === 'On' ? offClass : onClass;
+            var addClass = otherSelector === offClass ? 'btn-success' : 'btn-danger';
+            var removeClass = otherSelector === offClass ? 'btn-danger' : 'btn-success';
+            var status = otherSelector === offClass ? 'on' : 'off';
+            areaDiv.find('.' + otherSelector).removeClass(removeClass);
+            _this.addClass(addClass);
+            building_objects[objectKey].status = BUILDING_STATUS[status];
+        }
+
         var objectAreas = $('.object-area');
-        objectAreas.off('click').on('click', function() {
+        var onClass = 'object-on';
+        var offClass = 'object-off';
+        objectAreas.off('click').on('click', function(e) {
             var amount;
             var objectKey = this.id.split('-')[1];
             var obj = building_objects[objectKey];
-            if (!canPurchase(obj)) return;
+            if (e.target.classList.contains('btn') || !canPurchase(obj)) return;
 
             decreasePlayerResourcesForObject(obj.cost);
             decreaseUsableTileSpaceForObject(obj.size);
@@ -262,15 +276,13 @@ $(function($) {
             updateUiValues();
         });
 
-        objectAreas.find('.object-on').on('click', function(e) {
-            var objectKey = $(this).parent()[0].id.split('-')[1];
-            building_objects[objectKey].status = BUILDING_STATUS.on;
+        objectAreas.find('.object-on').off('click').on('click', function(e) {
+            onSwitchClick($(this));
             e.preventDefault();
         });
 
-        objectAreas.find('.object-off').on('click', function(e) {
-            var objectKey = $(this).parent()[0].id.split('-')[1];
-            building_objects[objectKey].status = BUILDING_STATUS.off;
+        objectAreas.find('.object-off').off('click').on('click', function(e) {
+            onSwitchClick($(this));
             e.preventDefault();
         });
     }
@@ -663,7 +675,7 @@ $(function($) {
             var buildingObject = building_objects[objKey];
             buildingObject.amount = obj.amount;
             buildingObject.cost = obj.cost;
-            buildingObject.status = obj.status;
+            buildingObject.status = isNullUndefined(obj.status) ? true : obj.status;
         });
     }
     
