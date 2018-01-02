@@ -22,9 +22,10 @@
 }
 
 #resources button, #non-accumulative-resources button {
-    margin-top: 7px;
+    margin-top: 1px;
     width: 100%;
     text-align: left;
+    padding: .125rem .75rem;
 }
 
 .object-switch {
