@@ -120,7 +120,7 @@ $(function($) {
     var STARTING_TILES  =         100000;
     var SMALLEST_PLANET =    11000000000; // 11 billion acres
     var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion acres
-    var BUILDING_STATUS = { on: 1, off: 0 };
+    var BUILDING_STATUS = { ON: 1, OFF: 0 };
     
     function doForKeys(obj, func) {
         var i, len, key;
@@ -272,7 +272,7 @@ $(function($) {
             var otherSelector = _this[0].innerText === 'On' ? offClass : onClass;
             var addClass = otherSelector === offClass ? 'btn-success' : 'btn-danger';
             var removeClass = otherSelector === offClass ? 'btn-danger' : 'btn-success';
-            var status = otherSelector === offClass ? 'on' : 'off';
+            var status = otherSelector === offClass ? 'ON' : 'OFF';
             areaDiv.find('.' + otherSelector).removeClass(removeClass);
             _this.addClass(addClass);
             building_objects[getObjectKey(_this)].status = BUILDING_STATUS[status];
@@ -355,7 +355,15 @@ $(function($) {
         
         updateResources();
     }
-    
+
+    function isManualObject(obj) {
+        return obj.group === 'manualObject';
+    }
+
+    function isStorageObject(obj) {
+        return obj.group === 'storage';
+    }
+
     function autoHarvestResources() {
         doForKeys(nonAccumulativeResources, function(resourceKey) {
             var total = 0;
@@ -386,7 +394,7 @@ $(function($) {
             var effObjQuant, multiplier, m;
             var production = obj.produces;
             var amount = obj.amount;
-            if (manualObjects.indexOf(objKey) > -1) {
+            if (isManualObject(obj)) {
                 doForKeys(production, function(resourceKey) {
                     if (amount && !$(ID_PREFIX.RESOURCE_BUTTON + resourceKey).length) {
                         createResourceButton(resourceKey);
@@ -426,7 +434,7 @@ $(function($) {
         
         doForKeys(building_objects, function(objKey, obj) {
             var effObjQuant, multiplier;
-            if (manualObjects.indexOf(objKey) > -1) return;
+            if (isManualObject(obj)) return;
             
             effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
@@ -558,6 +566,9 @@ $(function($) {
             var origCost = value / Math.pow(m, oldAmount);
             cost[key] = origCost * multiplier;
         });
+        if (!oldAmount) {
+            obj.status = BUILDING_STATUS.ON;
+        }
     }
     
     function updateObjects() {
@@ -581,6 +592,14 @@ $(function($) {
             doForKeys(obj.cost, function(key, value) {
                 div.find('.cost.' + key).html(Math.floor(value));
             });
+
+            if (obj.status) {
+                div.find('.object-on').addClass('btn-success');
+                div.find('.object-off').removeClass('btn-danger');
+            } else if (!isNullUndefined(obj.status)) {
+                div.find('.object-on').removeClass('btn-success');
+                div.find('.object-off').addClass('btn-danger');
+            }
         }); 
     }
     
@@ -664,7 +683,8 @@ $(function($) {
     
     function initView() {
         updatePlanetInfo();
-        
+        applySavedBuildingAmounts();
+
         doForKeys(player_resources, function(key) {
             createResourceButton(key);
         });
@@ -683,14 +703,12 @@ $(function($) {
             updateUiValues();
         }, 1000);
         });
-        
+
         $('#erase-data').on('click', function() {
             doForKeys(STORAGE_KEY, function(key, value) {
                 delete localStorage[value];
             });
         });
-        
-        applySavedBuildingAmounts();
     }
     
     function applySavedBuildingAmounts() {
@@ -699,10 +717,10 @@ $(function($) {
             var buildingObject = building_objects[objKey];
             buildingObject.amount = obj.amount;
             buildingObject.cost = obj.cost;
-            buildingObject.status = isNullUndefined(obj.status) ? true : obj.status;
+            buildingObject.status = obj.status;
         });
     }
-    
+
     function createResourceButton(key) {
         var id = ID_PREFIX.RESOURCE_BUTTON.substring(1) + key;
         var manualResourceClass = manualResources.indexOf(key) === -1 ? '' : ' manual-resource';
@@ -723,9 +741,13 @@ $(function($) {
         
         var html, div;
         var obj = building_objects[key];
-        var isManualObject = manualObjects.indexOf(key) > -1;
-        var period = isManualObject ? 'click' : 'second';
-        var onOffBtns = isManualObject ? '' : '<div><button class="btn btn-default object-on">On</button></div><div><button class="btn btn-default object-off">Off</button></div>';
+        var manualObject = isManualObject(obj);
+        var period = manualObject ? 'click' : 'second';
+        var status = obj.status;
+        var onClass = status ? 'btn-success' : '';
+        var offClass = isNullUndefined(status) || status ? '' : 'btn-danger';
+        var onOffBtns = manualObject || isStorageObject(obj) ? ''
+                : '<div><button class="btn btn-default object-on ' + onClass + '">On</button></div><div><button class="btn btn-default object-off ' + offClass + '">Off</button></div>';
         var id = ID_PREFIX.OBJECT_AREA.substring(1) + key;
         var objProduction = {};
         

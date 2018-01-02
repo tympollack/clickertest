@@ -2,20 +2,23 @@
     display: inline-block;
     width: 250px;
     border: 1px dotted cornflowerblue;
-    margin: 25px 0 0 0;
+    vertical-align: top;
+    height: 37%;
+    overflow-y: auto;
 }
 
 #objects {
     overflow-y: auto;
-    max-height: 500px;
+    max-height: 63%;
 }
 
 #left-div {
-    width: 300px;
+    width: 280px;
     height: 100%;
-    padding: 0 25px;
+    padding: 0 10px;
     float: left;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #resources button, #non-accumulative-resources button {
