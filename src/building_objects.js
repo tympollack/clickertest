@@ -101,16 +101,16 @@ var building_objects = {
             width: 1,
             logistics: 1
         },
-        waste: .1,
+        waste: .01,
         pollution: 1,
         group: 'misc'
     },
     radarTowerSmall: {
         name: 'Radar Tower - Small',
         verb: 'Discover',
-        period: 5,
+        period: 1,
         amount: 0,
-        efficiency: 640,
+        efficiency: 30,
         produces: {},
         cost: {
             ironPlate: 250,
@@ -119,7 +119,7 @@ var building_objects = {
             greenChip: 50
         },
         drain: {
-            electricity: 25
+            electricity: 35
         },
         size: {
             length: 2,
@@ -152,7 +152,7 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: 0,
+        waste: .01,
         pollution: 5,
         group: 'misc'
     },
@@ -237,9 +237,9 @@ var building_objects = {
             width: 2,
             logistics: 2
         },
-        waste: 1,
+        waste: .05,
         pollution: 10,
-        group: 'coalDril'
+        group: 'harvesting'
     },
     coalDrillIron: {
         name: 'Coal-powered Drill',
@@ -262,9 +262,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .05,
         pollution: 10,
-        group: 'coalDril'
+        group: 'harvesting'
     },
     coalDrillCopper: {
         name: 'Coal-powered Drill',
@@ -287,9 +287,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .05,
         pollution: 10,
-        group: 'coalDril'
+        group: 'harvesting'
     },
     coalDrillStone: {
         name: 'Coal-powered Drill',
@@ -312,9 +312,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .05,
         pollution: 10,
-        group: 'coalDril'
+        group: 'harvesting'
     },
     electricDrillCoal: {
         name: 'Electric Drill',
@@ -338,9 +338,9 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 2,
+        waste: .075,
         pollution: 5,
-        group: 'electricDril'
+        group: 'harvesting'
     },
     electricDrillIron: {
         name: 'Electric Drill',
@@ -364,9 +364,9 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 2,
+        waste: .075,
         pollution: 5,
-        group: 'electricDril'
+        group: 'harvesting'
     },
     electricDrillCopper: {
         name: 'Electric Drill',
@@ -390,9 +390,9 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 2,
+        waste: .075,
         pollution: 5,
-        group: 'electricDril'
+        group: 'harvesting'
     },
     electricDrillStone: {
         name: 'Electric Drill',
@@ -416,9 +416,9 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 2,
+        waste: .075,
         pollution: 5,
-        group: 'electricDril'
+        group: 'harvesting'
     },
     miningRobotCoal: {
         name: 'Mining Robot - Coal',
@@ -442,9 +442,9 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: .25,
+        waste: .025,
         pollution: 1,
-        group: 'miningRobotics'
+        group: 'robotics'
     },
     miningRobotIron: {
         name: 'Mining Robot - Iron',
@@ -468,9 +468,9 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: .25,
+        waste: .025,
         pollution: 1,
-        group: 'miningRobotics'
+        group: 'robotics'
     },
     miningRobotCopper: {
         name: 'Mining Robot - Copper',
@@ -494,9 +494,9 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: .25,
+        waste: .025,
         pollution: 1,
-        group: 'miningRobotics'
+        group: 'robotics'
     },
     miningRobotStone: {
         name: 'Mining Robot - Stone',
@@ -520,9 +520,9 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: .25,
+        waste: .025,
         pollution: 1,
-        group: 'miningRobotics'
+        group: 'robotics'
     },
     miningRobotUranium: {
         name: 'Mining Robot - Uranium',
@@ -546,9 +546,9 @@ var building_objects = {
             width: 0,
             logistics: 0
         },
-        waste: .25,
+        waste: .025,
         pollution: 1,
-        group: 'miningRobotics'
+        group: 'robotics'
     },
     smelterIron: {
         name: 'Iron Smelter',
@@ -571,9 +571,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .1,
         pollution: 20,
-        group: 'smelter'
+        group: 'smelting'
     },
     smelterCopper: {
         name: 'Copper Smelter',
@@ -596,9 +596,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .1,
         pollution: 20,
-        group: 'smelter'
+        group: 'smelting'
     },
     smelterStone: {
         name: 'Stone Smelter',
@@ -621,9 +621,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .1,
         pollution: 20,
-        group: 'smelter'
+        group: 'smelting'
     },
     smelterSteel: {
         name: 'Steel Smelter',
@@ -646,9 +646,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 1,
+        waste: .1,
         pollution: 20,
-        group: 'smelter'
+        group: 'smelting'
     },
     advancedSmelterIron: {
         name: 'Advanced Iron Smelter',
@@ -672,9 +672,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 2,
+        waste: .2,
         pollution: 40,
-        group: 'smelterAdvanced'
+        group: 'smelting'
     },
     advancedSmelterCopper: {
         name: 'Advanced Copper Smelter',
@@ -698,9 +698,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 2,
+        waste: .2,
         pollution: 40,
-        group: 'smelterAdvanced'
+        group: 'smelting'
     },
     advancedSmelterStone: {
         name: 'Advanced Stone Smelter',
@@ -724,9 +724,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 2,
+        waste: .2,
         pollution: 40,
-        group: 'smelterAdvanced'
+        group: 'smelting'
     },
     advancedSmelterSteel: {
         name: 'Advanced Steel Smelter',
@@ -750,9 +750,9 @@ var building_objects = {
             width: 2,
             logistics: 4
         },
-        waste: 2,
+        waste: .2,
         pollution: 40,
-        group: 'smelterAdvanced'
+        group: 'smelting'
     },
     electricSmelterIron: {
         name: 'Electric Iron Smelter',
@@ -777,9 +777,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 3,
+        waste: .25,
         pollution: 10,
-        group: 'smelterElectric'
+        group: 'smelting'
     },
     electricSmelterCopper: {
         name: 'Electric Copper Smelter',
@@ -804,9 +804,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 3,
+        waste: .25,
         pollution: 10,
-        group: 'smelterElectric'
+        group: 'smelting'
     },
     electricSmelterStone: {
         name: 'Electric Stone Smelter',
@@ -831,9 +831,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 3,
+        waste: .25,
         pollution: 10,
-        group: 'smelterElectric'
+        group: 'smelting'
     },
     electricSmelterSteel: {
         name: 'Electric Steel Smelter',
@@ -858,9 +858,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 3,
+        waste: .25,
         pollution: 10,
-        group: 'smelterElectric'
+        group: 'smelting'
     },
     steamEngine: {
         name: 'Steam Engine',
@@ -882,11 +882,11 @@ var building_objects = {
             coal: 1
         },
         size: {
-            length: 2,
+            length: 7,
             width: 3,
             logistics: 2
         },
-        waste: 1,
+        waste: 0,
         pollution: 80,
         group: 'electricity'
     },
@@ -895,18 +895,20 @@ var building_objects = {
         verb: 'produce',
         period: 0,
         amount: 0,
-        efficiency: .5,
+        efficiency: 1,
         produces: {
-            electricity: 70
+            electricity: 42
         },
         cost: {
             greenChip: 15,
             steel: 5,
-            copperPlate: 5
+            copperPlate: 5,
+            battery: 5,
+            ironPlate: 2
         },
         drain: {},
         size: {
-            length: 3,
+            length: 4,
             width: 3,
             logistics: 0
         },
@@ -937,7 +939,7 @@ var building_objects = {
             width: 3,
             logistics: 1
         },
-        waste: 1,
+        waste: 0,
         pollution: 30,
         group: 'liquid'
     },
@@ -993,7 +995,7 @@ var building_objects = {
             width: 5,
             logistics: 3
         },
-        waste: 5,
+        waste: .05,
         pollution: 50,
         group: 'liquid'
     },
@@ -1022,7 +1024,7 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1051,7 +1053,7 @@ var building_objects = {
             width: 3,
             logistics: 5
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1081,7 +1083,7 @@ var building_objects = {
             width: 3,
             logistics: 8
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1110,7 +1112,7 @@ var building_objects = {
             width: 3,
             logistics: 7
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1140,35 +1142,7 @@ var building_objects = {
             width: 3,
             logistics: 7
         },
-        waste: 3,
-        pollution: 50,
-        group: 'liquid'
-    },
-    lubricantChemicalPlant: {
-        name: 'Lubricant Chemical Plant',
-        verb: 'refine',
-        period: 1,
-        amount: 0,
-        efficiency: 1,
-        produces: {
-            lubricant: 1
-        },
-        cost: {
-            greenChip: 5,
-            cog: 5,
-            pipe: 10,
-            steel: 5
-        },
-        drain: {
-            electricity: 25,
-            lightOil: 1
-        },
-        size: {
-            length: 3,
-            width: 3,
-            logistics: 2
-        },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1196,7 +1170,7 @@ var building_objects = {
             width: 3,
             logistics: 4
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1224,7 +1198,7 @@ var building_objects = {
             width: 3,
             logistics: 4
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1254,7 +1228,7 @@ var building_objects = {
             width: 3,
             logistics: 7
         },
-        waste: 3,
+        waste: .03,
         pollution: 50,
         group: 'liquid'
     },
@@ -1282,9 +1256,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 1,
+        waste: .01,
         pollution: 30,
-        group: 't1Production'
+        group: 'production'
     },
     rodAssembler: {
         name: 'Iron Rod Assembler',
@@ -1310,9 +1284,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 1,
+        waste: .01,
         pollution: 30,
-        group: 't1Production'
+        group: 'production'
     },
     pipeAssembler: {
         name: 'Pipe Assembler',
@@ -1338,9 +1312,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 1,
+        waste: .01,
         pollution: 30,
-        group: 't1Production'
+        group: 'production'
     },
     wireAssembler: {
         name: 'Wire Assembler',
@@ -1366,9 +1340,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 1,
+        waste: .01,
         pollution: 30,
-        group: 't1Production'
+        group: 'production'
     },
     greenChipAssembler: {
         name: 'Green Chip Assembler',
@@ -1395,9 +1369,9 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 1,
+        waste: .01,
         pollution: 30,
-        group: 't1Production'
+        group: 'production'
     },
     concreteAssembler: {
         name: 'Concrete Assembler',
@@ -1425,9 +1399,9 @@ var building_objects = {
             width: 3,
             logistics: 7
         },
-        waste: 2,
+        waste: .02,
         pollution: 50,
-        group: 't2Production'
+        group: 'production'
     },
     engineAssembler: {
         name: 'Engine Assembler',
@@ -1455,9 +1429,9 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 2,
+        waste: .02,
         pollution: 50,
-        group: 't2Production'
+        group: 'production'
     },
     redChipAssembler: {
         name: 'Red Chip Assembler',
@@ -1485,9 +1459,9 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 2,
+        waste: .02,
         pollution: 50,
-        group: 't2Production'
+        group: 'production'
     },
     electricEngineAssmebler: {
         name: 'Electric Engine Assembler',
@@ -1507,7 +1481,7 @@ var building_objects = {
         },
         drain: {
             electricity: 25,
-            lubricant: 15,
+            lightOil: 15,
             engine: 1,
             greenChip: 2
         },
@@ -1516,9 +1490,9 @@ var building_objects = {
             width: 3,
             logistics: 7
         },
-        waste: 4,
+        waste: .04,
         pollution: 70,
-        group: 't3Production'
+        group: 'production'
     },
     purpleChipAssembler: {
         name: 'Purple Chip Assembler',
@@ -1547,9 +1521,9 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 2,
+        waste: .04,
         pollution: 50,
-        group: 't3Production'
+        group: 'production'
     },
     robotBodyAssembler: {
         name: 'Robot Body Assembler',
@@ -1579,9 +1553,9 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 4,
+        waste: .04,
         pollution: 70,
-        group: 't3Production'
+        group: 'production'
     },
     roboticsFacility: {
         name: 'Robotics Facility',
@@ -1605,8 +1579,8 @@ var building_objects = {
             width: 4,
             logistics: 0
         },
-        waste: 4,
-        pollution: 70,
+        waste: 0,
+        pollution: 5,
         group: 'robotics'
     },
     logisticsRobot: {
@@ -1662,7 +1636,7 @@ var building_objects = {
         verb: 'produce',
         period: 0,
         amount: 0,
-        efficiency: 1,
+        efficiency: 10,
         produces: {},
         cost: {
             robotBody: 1,
@@ -1673,9 +1647,9 @@ var building_objects = {
             robotSpace: 1
         },
         size: {
-            length: 3,
-            width: 3,
-            logistics: 3
+            length: 0,
+            width: 0,
+            logistics: 0
         },
         waste: 0,
         pollution: 0,
@@ -1705,7 +1679,7 @@ var building_objects = {
             width: 3,
             logistics: 3
         },
-        waste: 2,
+        waste: .02,
         pollution: 0,
         group: 'research'
     },
@@ -1734,7 +1708,7 @@ var building_objects = {
             width: 3,
             logistics: 6
         },
-        waste: 5,
+        waste: .05,
         pollution: 0,
         group: 'research'
     },
@@ -1765,7 +1739,7 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 10,
+        waste: .1,
         pollution: 0,
         group: 'research'
     },
@@ -1797,7 +1771,7 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 33,
+        waste: .33,
         pollution: 0,
         group: 'research'
     },
@@ -1830,7 +1804,7 @@ var building_objects = {
             width: 3,
             logistics: 12
         },
-        waste: 15,
+        waste: .15,
         pollution: 0,
         group: 'research'
     },
@@ -1861,7 +1835,7 @@ var building_objects = {
             width: 3,
             logistics: 9
         },
-        waste: 15,
+        waste: .15,
         pollution: 0,
         group: 'research'
     }

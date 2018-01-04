@@ -65,7 +65,8 @@ $(function($) {
         stone:   2515,
         oil:      881,
         uranium: 5145,
-        water:   1000
+        water:   1000,
+        waste:   109000000
     };
 
     var discovered_tiles = getSavedValue(STORAGE_KEY.DISCOVERED_TILES) || {
@@ -102,18 +103,20 @@ $(function($) {
         greenChip: { ironPlate: 1, wire: 3 }
     };
     
-    var groupOrder = ['manualObjects', 'misc', 'coalDrill', 'electricDrill', 'miningRobotics', 'smelter', 'smelterAdvanced', 'smelterElectric', 'research',
-                      't1Production', 't2Production', 't3Production', 'robotics', 'liquid', 'electricity', 'storage'];
-    
+    var groupOrder = ['manualObject', 'harvesting', 'smelting', 'production', 'liquid', 'electricity',
+                      'robotics', 'research', 'misc', 'storage'];
+
     var manualResources = ['wood', 'coal', 'iron', 'copper', 'stone', 'cog', 'pipe', 'wire', 'rod', 'greenChip'];
-    var manualObjects = ['pickaxe', 'handProcessor', 'explore', 'restoreLand'];
     var radarObjects = ['radarTowerSmall'];
     var excavationObjects = ['excavator1'];
+    var wasteCleaningObjects = ['recyclerRobot'];
+    var pollutionCleaningObjects = ['airScrubberRobot'];
 
     var ID_PREFIX = {
         RESOURCE_BUTTON: '#btn-',
         OBJECT_AREA: '#area-',
-        OBJECT_GROUP: '#object-group-'
+        OBJECT_GROUP: '#object-group-',
+        OBJECT_NAV: '#object-nav-'
     };
 
     var timer = null;
@@ -121,6 +124,7 @@ $(function($) {
     var SMALLEST_PLANET =    11000000000; // 11 billion acres
     var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion acres
     var BUILDING_STATUS = { ON: 1, OFF: 0 };
+    var WOOD_POLLUTION_SCRUBBING_BY_ACRE = 2.9888;
     
     function doForKeys(obj, func) {
         var i, len, key;
@@ -163,7 +167,8 @@ $(function($) {
         planetTilesDiv.add(discoveredTilesDiv).add(planetResourcesDiv).empty();
         
         doForKeys(planetary_tiles, function(key, value) {
-            var html = '<div>' + key + ': ' + value + '</div>';
+            var val = roundTo(value, 3);
+            var html = '<div>' + key + ': ' + val + '</div>';
             planetTilesDiv.append(html);
         });
 
@@ -312,7 +317,7 @@ $(function($) {
     }
     
     function harvestPlanetaryResource(resourceKey, harvestAmount) {
-        var amount = Math.min(planetary_resources[resourceKey], harvestAmount);
+        var amount = Math.min(discovered_tiles[resourceKey], harvestAmount);
         var acreAmount = amount / RESOURCE_WEIGHT_BY_ACRE[resourceKey];
         player_resources[resourceKey] += amount;
         planetary_resources[resourceKey] -= acreAmount;
@@ -365,6 +370,9 @@ $(function($) {
     }
 
     function autoHarvestResources() {
+        var treeCleaningAmount = discovered_tiles.wood * WOOD_POLLUTION_SCRUBBING_BY_ACRE;
+        planetary_tiles.pollution -= treeCleaningAmount;
+
         doForKeys(nonAccumulativeResources, function(resourceKey) {
             var total = 0;
             doForKeys(building_objects, function(objKey, obj) {
@@ -405,6 +413,8 @@ $(function($) {
             
             effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
+            planetary_tiles.waste += effObjQuant * obj.waste / RESOURCE_WEIGHT_BY_ACRE.waste;
+            planetary_tiles.pollution += effObjQuant * obj.pollution;
 
             if (radarObjects.indexOf(objKey) > -1) {
                 discoverTiles(multiplier);
@@ -414,6 +424,10 @@ $(function($) {
                 m = Math.min(multiplier, discovered_tiles.damagedLand);
                 discovered_tiles.damagedLand -= m;
                 discovered_tiles.land += m;
+            } else if (wasteCleaningObjects.indexOf(objKey) > -1) {
+                planetary_tiles.waste -= Math.min(multiplier, planetary_tiles.waste) / RESOURCE_WEIGHT_BY_ACRE.waste;
+            } else if (pollutionCleaningObjects.indexOf(objKey) > -1) {
+                planetary_tiles.pollution -= Math.min(multiplier, planetary_tiles.pollution);
             }
 
             doForKeys(production, function(resourceKey, value) {
@@ -580,10 +594,6 @@ $(function($) {
             var id = ID_PREFIX.OBJECT_AREA + key;
             var div = $(id);
             
-            if (!div || !div.length) {
-                div = addObjectGroupIfNeeded(key, obj);
-            }
-            
             div.find('.efficiency').html(efficiency);
             div.find('.amount').html(amount);
             div.find('.production').html(total);
@@ -602,42 +612,23 @@ $(function($) {
             }
         }); 
     }
-    
-    function addObjectGroupIfNeeded(key, obj) {
-        var i, len, otherGroupKey, otherGroupDiv, found;
-        var div = createBuildingObject(key);
-        var group = obj.group;
-        var id = ID_PREFIX.OBJECT_GROUP + group;
-        var groupDiv = $(id);
-        if (!groupDiv.length) {
-            groupDiv = $('<div id="' + id.substring(1) + '" class="object-group"></div>');
-            found = false;
-            for (i = groupOrder.indexOf(group) - 1; i >= 0; i--) {
-                otherGroupKey = groupOrder[i];
-                otherGroupDiv = $(ID_PREFIX.OBJECT_GROUP + otherGroupKey);
-                if (otherGroupDiv.length) {
-                    otherGroupDiv.after(groupDiv);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                for (i = groupOrder.indexOf(group) + 1, len = groupOrder.length; i < len; i++) {
-                    otherGroupKey = groupOrder[i];
-                    otherGroupDiv = $(ID_PREFIX.OBJECT_GROUP + otherGroupKey);
-                    if (otherGroupDiv.length) {
-                        otherGroupDiv.before(groupDiv);
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                $('#objects').append(groupDiv);
-            }
+
+    function createObjectNav() {
+        var i, len, group;
+        var navDiv = $('#objects-nav');
+        var html = '';
+        for (i = 0, len = groupOrder.length; i < len; i++) {
+            group = groupOrder[i];
+            html += '<div id="' + ID_PREFIX.OBJECT_NAV + group + '" class="object-group-nav-item">' + group + '</div>';
         }
-        groupDiv.append(div);
-        return div;
+        navDiv.append(html);
+        navDiv.find('.object-group-nav-item').on('click', function() {
+            var group = $(this)[0].id.split(ID_PREFIX.OBJECT_NAV)[1];
+            $('.object-area').hide();
+            $('.object-area-' + group).show();
+            $('.object-group-nav-item').removeClass('nav-selected');
+            $(this).addClass('nav-selected');
+        }).first().click();
     }
 
     function discoverTiles(numTiles) {
@@ -682,17 +673,19 @@ $(function($) {
     }
     
     function initView() {
+        var objectsDiv = $('#objects');
         updatePlanetInfo();
         applySavedBuildingAmounts();
 
         doForKeys(player_resources, function(key) {
             createResourceButton(key);
         });
-        
+
         doForKeys(building_objects, function(key, obj) {
-            addObjectGroupIfNeeded(key, obj);
+            objectsDiv.append(createBuildingObject(key));
         });
-        
+        createObjectNav();
+
         $('#clear-timer').on('click', function() {
             clearInterval(timer);
         });
@@ -755,7 +748,7 @@ $(function($) {
             objProduction[key] = value * obj.efficiency * obj.amount;
         });
         
-        html = '<div class="object-area" id="' + id + '">'
+        html = '<div class="object-area object-area-' + obj.group + '" id="' + id + '">'
              + '<div class="object-switch">' + onOffBtns
              + '<div><button class="btn btn-default object-sell">Sell</button></div></div>'
              + '<div>' + obj.name + '</div>'

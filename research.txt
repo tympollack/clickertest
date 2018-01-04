@@ -1,4 +1,14 @@
 acre of trees = .000072 kg/s
+50 trees = .000072 kg/s
+770 kg wood = .000072 kg/s
+1 kg wood = .000072 / 770 = 9.351 * 10^-8 kg/s
+
+http://urbanforestrynetwork.org/benefits/air%20quality.htm
+adult tree 48 pounds/year (21.81 repeating kg)
+.0598 kg/d
+acre = 2.9888 kg/d
+https://www.ucsusa.org/clean-energy/coal-and-other-fossil-fuels/coal-air-pollution#.Wk0gVt-nGUk
+
 
 trucks = .03 kg/s
 

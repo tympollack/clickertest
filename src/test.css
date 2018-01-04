@@ -1,4 +1,11 @@
-#planet-tiles, #discovered-tiles, #planet-resources {
+html, body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.planet-info {
     display: inline-block;
     width: 250px;
     border: 1px dotted cornflowerblue;
@@ -7,9 +14,24 @@
     overflow-y: auto;
 }
 
-#objects {
-    overflow-y: auto;
+#objects-wrapper {
     max-height: 63%;
+}
+
+#objects {
+    max-height: 63%;
+    overflow-y: auto;
+}
+
+.nav-selected {
+    color: white;
+    background-color: cornflowerblue;
+    font-weight: 400;
+    border-radius: 5px;
+}
+
+.object-group-nav-item {
+    padding: 0 5px;
 }
 
 #left-div {
@@ -21,7 +43,7 @@
     overflow-x: hidden;
 }
 
-#resources button, #non-accumulative-resources button {
+.resource-panel button{
     margin-top: 1px;
     width: 100%;
     text-align: left;
@@ -37,28 +59,16 @@
     padding: .175rem .75rem;
 }
 
-.object-group {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-.object-area div {
-    white-space: normal;
-}
-
 .object-area {
     width: 250px;
+    height: 85px;
     border: 1px solid black;
     margin: 10px 10px 0 0;
     padding: 2px;
+    vertical-align: top;
     display: inline-block;
     font-size: small;
     line-height: 1em;
-    
-    -webkit-user-select: none;  
-    -moz-user-select: none;    
-    -ms-user-select: none;      
-    user-select: none;
 }
 
 .object-area.can-purchase {
