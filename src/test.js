@@ -65,8 +65,7 @@ $(function($) {
         stone:   2515,
         oil:      881,
         uranium: 5145,
-        water:   1000,
-        waste:   109000000
+        water:   1000
     };
 
     var discovered_tiles = getSavedValue(STORAGE_KEY.DISCOVERED_TILES) || {
@@ -124,7 +123,7 @@ $(function($) {
     var SMALLEST_PLANET =    11000000000; // 11 billion acres
     var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion acres
     var BUILDING_STATUS = { ON: 1, OFF: 0 };
-    var WOOD_POLLUTION_SCRUBBING_BY_ACRE = 2.9888;
+    var WOOD_POLLUTION_SCRUBBING_BY_ACRE = .05978;
     
     function doForKeys(obj, func) {
         var i, len, key;
@@ -287,19 +286,28 @@ $(function($) {
         var onClass = 'object-on';
         var offClass = 'object-off';
         objectAreas.on('click', function(e) {
-            var amount;
+            var amount, eff;
             var objectKey = this.id.split('-')[1];
             var obj = building_objects[objectKey];
             if (e.target.classList.contains('btn') || !canPurchase(obj)) return;
 
+            eff = obj.efficiency;
             buyObject(obj);
-            if (objectKey === 'explore') {
-                amount = Math.min(obj.efficiency, planetary_tiles.total);
-                discoverTiles(amount);
-            } else if (objectKey === 'restoreLand') {
-                amount = Math.floor(Math.min(obj.efficiency, discovered_tiles.damagedLand));
-                discovered_tiles.damagedLand -= amount;
-                discovered_tiles.land += amount;
+            switch (objectKey) {
+                case 'explore':
+                    amount = Math.min(eff, planetary_tiles.total);
+                    discoverTiles(amount);
+                    break;
+                case 'restoreLand':
+                    amount = Math.min(eff, discovered_tiles.damagedLand);
+                    discovered_tiles.damagedLand -= amount;
+                    discovered_tiles.land += amount;
+                    break;
+                case 'waterLandfill':
+                    amount = Math.min(eff, discovered_tiles.water);
+                    discovered_tiles.water -= amount;
+                    discovered_tiles.land += amount;
+                    break;
             }
             
             updateUiValues();
@@ -413,7 +421,7 @@ $(function($) {
             
             effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
-            planetary_tiles.waste += effObjQuant * obj.waste / RESOURCE_WEIGHT_BY_ACRE.waste;
+            planetary_tiles.waste += effObjQuant * obj.waste;
             planetary_tiles.pollution += effObjQuant * obj.pollution;
 
             if (radarObjects.indexOf(objKey) > -1) {
@@ -425,7 +433,7 @@ $(function($) {
                 discovered_tiles.damagedLand -= m;
                 discovered_tiles.land += m;
             } else if (wasteCleaningObjects.indexOf(objKey) > -1) {
-                planetary_tiles.waste -= Math.min(multiplier, planetary_tiles.waste) / RESOURCE_WEIGHT_BY_ACRE.waste;
+                planetary_tiles.waste -= Math.min(multiplier, planetary_tiles.waste);
             } else if (pollutionCleaningObjects.indexOf(objKey) > -1) {
                 planetary_tiles.pollution -= Math.min(multiplier, planetary_tiles.pollution);
             }

@@ -51,6 +51,8 @@ largest planet = 47,400,000,000 mi2 = 240.61 times earth
 
 oil - have used 944 b barrels, still 1.5 t barrels left
 
+landfill: 109000000
+
 material densities - https://www.simetric.co.uk/si_materials.htm
 water       1000 kg/m3
 coal        1346

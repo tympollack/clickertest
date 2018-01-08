@@ -69,7 +69,26 @@ var building_objects = {
         cost: {
             wood: .1,
             iron: .1,
-            stone: .1
+            stone: 1
+        },
+        drain: {},
+        size: {
+            length: 0,
+            width: 0,
+            logistics: 0
+        },
+        group: 'manualObject'
+    },
+    waterLandfill: {
+        name: 'Fill in Water',
+        verb: 'Fill',
+        amount: 0,
+        efficiency: 1,
+        produces: {},
+        cost: {
+            wood: .1,
+            iron: .1,
+            stone: 10
         },
         drain: {},
         size: {
@@ -133,9 +152,9 @@ var building_objects = {
     excavator1: {
         name: 'Excavator 1',
         verb: 'Restore',
-        period: 10,
+        period: 1,
         amount: 0,
-        efficiency: 1,
+        efficiency: .1,
         produces: {},
         cost: {
             ironPlate: 50,
@@ -145,7 +164,8 @@ var building_objects = {
             greenChip: 10
         },
         drain: {
-            coal: 1
+            coal: 1,
+            stone: 2
         },
         size: {
             length: 0,
