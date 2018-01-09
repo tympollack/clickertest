@@ -154,7 +154,7 @@ var building_objects = {
         verb: 'Restore',
         period: 1,
         amount: 0,
-        efficiency: .1,
+        efficiency: .01,
         produces: {},
         cost: {
             ironPlate: 50,
@@ -164,8 +164,8 @@ var building_objects = {
             greenChip: 10
         },
         drain: {
-            coal: 1,
-            stone: 2
+            coal: .1,
+            stone: .2
         },
         size: {
             length: 0,
@@ -181,7 +181,7 @@ var building_objects = {
         verb: 'store',
         period: 0,
         amount: 1,
-        efficiency: 1,
+        efficiency: 2000,
         produces: {},
         cost: {
             wood: 8
@@ -201,7 +201,7 @@ var building_objects = {
         verb: 'store',
         period: 0,
         amount: 0,
-        efficiency: 1,
+        efficiency: 4000,
         produces: {},
         cost: {
             ironPlate: 8
@@ -221,7 +221,7 @@ var building_objects = {
         verb: 'store',
         period: 0,
         amount: 0,
-        efficiency: 1,
+        efficiency: 8000,
         produces: {},
         cost: {
             steel: 8
@@ -229,7 +229,75 @@ var building_objects = {
         drain: {},
         size: {
             length: 1,
-            width: 1,
+            width: 2,
+            logistics: 0
+        },
+        waste: 0,
+        pollution: 0,
+        group: 'storage'
+    },
+    storageShed: {
+        name: 'Storage Shed',
+        verb: 'store',
+        period: 0,
+        amount: 0,
+        efficiency: 64000,
+        produces: {},
+        cost: {
+            wood: 50,
+            rod: 5,
+            concrete: 2
+        },
+        drain: {},
+        size: {
+            length: 2,
+            width: 2,
+            logistics: 0
+        },
+        waste: 0,
+        pollution: 0,
+        group: 'storage'
+    },
+    storageUnit: {
+        name: 'Storage Unit',
+        verb: 'store',
+        period: 0,
+        amount: 0,
+        efficiency: 256000,
+        produces: {},
+        cost: {
+            ironPlate: 75,
+            rod: 100,
+            concrete: 200,
+            steel: 25
+        },
+        drain: {},
+        size: {
+            length: 5,
+            width: 5,
+            logistics: 0
+        },
+        waste: 0,
+        pollution: 0,
+        group: 'storage'
+    },
+    storageWarehouse: {
+        name: 'Warehouse',
+        verb: 'store',
+        period: 0,
+        amount: 0,
+        efficiency: 1024000,
+        produces: {},
+        cost: {
+            ironPlate: 75,
+            rod: 100,
+            concrete: 200,
+            steel: 25
+        },
+        drain: {},
+        size: {
+            length: 12,
+            width: 6,
             logistics: 0
         },
         waste: 0,
@@ -237,7 +305,7 @@ var building_objects = {
         group: 'storage'
     },
     coalDrillCoal: {
-        name: 'Coal-powered Drill',
+        name: 'Coal-powered Drill - Coal',
         verb: 'Harvest coal',
         period: 1,
         amount: 0,
@@ -262,7 +330,7 @@ var building_objects = {
         group: 'harvesting'
     },
     coalDrillIron: {
-        name: 'Coal-powered Drill',
+        name: 'Coal-powered Drill - Iron',
         verb: 'Harvest iron',
         period: 1,
         amount: 0,
@@ -287,7 +355,7 @@ var building_objects = {
         group: 'harvesting'
     },
     coalDrillCopper: {
-        name: 'Coal-powered Drill',
+        name: 'Coal-powered Drill - Copper',
         verb: 'Harvest copper',
         period: 1,
         amount: 0,
@@ -312,7 +380,7 @@ var building_objects = {
         group: 'harvesting'
     },
     coalDrillStone: {
-        name: 'Coal-powered Drill',
+        name: 'Coal-powered Drill - Stone',
         verb: 'Harvest stone',
         period: 1,
         amount: 0,
@@ -337,7 +405,7 @@ var building_objects = {
         group: 'harvesting'
     },
     electricDrillCoal: {
-        name: 'Electric Drill',
+        name: 'Electric Drill - Coal',
         verb: 'Harvest coal faster',
         period: 2,
         amount: 0,
@@ -363,7 +431,7 @@ var building_objects = {
         group: 'harvesting'
     },
     electricDrillIron: {
-        name: 'Electric Drill',
+        name: 'Electric Drill - Iron',
         verb: 'Harvest iron faster',
         period: 2,
         amount: 0,
@@ -389,7 +457,7 @@ var building_objects = {
         group: 'harvesting'
     },
     electricDrillCopper: {
-        name: 'Electric Drill',
+        name: 'Electric Drill - Copper',
         verb: 'Harvest copper faster',
         period: 2,
         amount: 0,
@@ -415,7 +483,7 @@ var building_objects = {
         group: 'harvesting'
     },
     electricDrillStone: {
-        name: 'Electric Drill',
+        name: 'Electric Drill - Stone',
         verb: 'Harvest stone faster',
         period: 2,
         amount: 0,
@@ -673,11 +741,11 @@ var building_objects = {
     advancedSmelterIron: {
         name: 'Advanced Iron Smelter',
         verb: 'smelt',
-        period: 2,
+        period: 1,
         amount: 0,
         efficiency: 1,
         produces: {
-            ironPlate: 3
+            ironPlate: 2
         },
         cost: {
             brick: 10,
@@ -685,7 +753,7 @@ var building_objects = {
         },
         drain: {
             coal: .5,
-            iron: 3
+            iron: 2
         },
         size: {
             length: 2,
@@ -699,11 +767,11 @@ var building_objects = {
     advancedSmelterCopper: {
         name: 'Advanced Copper Smelter',
         verb: 'smelt',
-        period: 2,
+        period: 1,
         amount: 0,
         efficiency: 1,
         produces: {
-            copperPlate: 3
+            copperPlate: 2
         },
         cost: {
             brick: 10,
@@ -711,7 +779,7 @@ var building_objects = {
         },
         drain: {
             coal: .5,
-            copper: 3
+            copper: 2
         },
         size: {
             length: 2,
@@ -725,11 +793,11 @@ var building_objects = {
     advancedSmelterStone: {
         name: 'Advanced Stone Smelter',
         verb: 'smelt',
-        period: 2,
+        period: 1,
         amount: 0,
         efficiency: 1,
         produces: {
-            brick: 3
+            brick: 2
         },
         cost: {
             brick: 10,
@@ -737,7 +805,7 @@ var building_objects = {
         },
         drain: {
             coal: .5,
-            stone: 6
+            stone: 4
         },
         size: {
             length: 2,
@@ -751,11 +819,11 @@ var building_objects = {
     advancedSmelterSteel: {
         name: 'Advanced Steel Smelter',
         verb: 'smelt',
-        period: 2,
+        period: 1,
         amount: 0,
         efficiency: 1,
         produces: {
-            steel: 3
+            steel: 2
         },
         cost: {
             brick: 10,
@@ -763,7 +831,7 @@ var building_objects = {
         },
         drain: {
             coal: .5,
-            ironPlate: 15
+            ironPlate: 10
         },
         size: {
             length: 2,
@@ -777,7 +845,7 @@ var building_objects = {
     electricSmelterIron: {
         name: 'Electric Iron Smelter',
         verb: 'smelt',
-        period: 3,
+        period: 2,
         amount: 0,
         efficiency: 1,
         produces: {
@@ -804,7 +872,7 @@ var building_objects = {
     electricSmelterCopper: {
         name: 'Electric Copper Smelter',
         verb: 'smelt',
-        period: 3,
+        period: 2,
         amount: 0,
         efficiency: 1,
         produces: {
@@ -831,7 +899,7 @@ var building_objects = {
     electricSmelterStone: {
         name: 'Electric Stone Smelter',
         verb: 'smelt',
-        period: 3,
+        period: 2,
         amount: 0,
         efficiency: 1,
         produces: {
@@ -858,7 +926,7 @@ var building_objects = {
     electricSmelterSteel: {
         name: 'Electric Steel Smelter',
         verb: 'smelt',
-        period: 3,
+        period: 2,
         amount: 0,
         efficiency: 1,
         produces: {
@@ -1632,7 +1700,7 @@ var building_objects = {
         verb: 'produce',
         period: 0,
         amount: 0,
-        efficiency: 1,
+        efficiency: 10,
         produces: {},
         cost: {
             robotBody: 1,

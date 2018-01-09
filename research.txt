@@ -5,7 +5,7 @@ acre of trees = .000072 kg/s
 
 http://urbanforestrynetwork.org/benefits/air%20quality.htm
 adult tree 48 pounds/year (21.81 repeating kg)
-.0598 kg/d
+.05978 kg/d
 acre = 2.9888 kg/d
 https://www.ucsusa.org/clean-energy/coal-and-other-fossil-fuels/coal-air-pollution#.Wk0gVt-nGUk
 
@@ -16,10 +16,10 @@ trucks = .03 kg/s
 factories = .317 kg/s
 	carcinogins = .065 kg/s
 	
-	
+10 mil factories = .002765 kg/d/fac
 	
 14,500,000,000 acres trees at start
-9,880,000 acres now
+ 9,880,000,000 acres now
 1 acre = 40-60 trees
  d = 821.918 acre/d
  

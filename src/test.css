@@ -10,7 +10,7 @@ html, body {
     width: 250px;
     border: 1px dotted cornflowerblue;
     vertical-align: top;
-    height: 37%;
+    height: 30%;
     overflow-y: auto;
 }
 
@@ -19,7 +19,7 @@ html, body {
 }
 
 #objects {
-    max-height: 63%;
+    max-height: 70%;
     overflow-y: auto;
 }
 

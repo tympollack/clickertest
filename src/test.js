@@ -65,7 +65,8 @@ $(function($) {
         stone:   2515,
         oil:      881,
         uranium: 5145,
-        water:   1000
+        water:   1000,
+        waste:   5000
     };
 
     var discovered_tiles = getSavedValue(STORAGE_KEY.DISCOVERED_TILES) || {
@@ -123,7 +124,7 @@ $(function($) {
     var SMALLEST_PLANET =    11000000000; // 11 billion acres
     var LARGEST_PLANET  = 29595000000000; // 29.6 quadrillion acres
     var BUILDING_STATUS = { ON: 1, OFF: 0 };
-    var WOOD_POLLUTION_SCRUBBING_BY_ACRE = .05978;
+    var WOOD_POLLUTION_SCRUBBING_BY_ACRE = .005978;
     
     function doForKeys(obj, func) {
         var i, len, key;
@@ -162,23 +163,27 @@ $(function($) {
         var planetTilesDiv = $('#planet-tiles');
         var discoveredTilesDiv = $('#discovered-tiles');
         var planetResourcesDiv = $('#planet-resources');
+        var totalDiscovered = 0;
         
         planetTilesDiv.add(discoveredTilesDiv).add(planetResourcesDiv).empty();
-        
-        doForKeys(planetary_tiles, function(key, value) {
-            var val = roundTo(value, 3);
-            var html = '<div>' + key + ': ' + val + '</div>';
-            planetTilesDiv.append(html);
-        });
 
         doForKeys(discovered_tiles, function(key, value) {
             var val = roundTo(value, 3);
             var html = '<div>' + key + ': ' + val + '</div>';
             discoveredTilesDiv.append(html);
+            totalDiscovered += value;
         });
-        discoveredTilesDiv.append('<div>usable remaining: ' + Math.floor(getTotalUsableTiles()) + '</div>');
-        discoveredTilesDiv.append('<div>storage space: ' + getTotalStorageSpace() + '</div>');
-        
+
+        doForKeys(planetary_tiles, function(key, value) {
+            var val = roundTo(value, 3);
+            var html = '<div>' + key + ': ' + val + '</div>';
+            planetTilesDiv.append(html);
+        });
+        planetTilesDiv.append('<div>total discovered: ' + Math.ceil(totalDiscovered) + '</div>');
+        planetTilesDiv.append('<div>eff logistics: ' + getTotalLogisticsSpace() + '</div>');
+        planetTilesDiv.append('<div>usable remaining: ' + Math.floor(getTotalUsableTiles()) + '</div>');
+        planetTilesDiv.append('<div>storage space: ' + getTotalStorageSpace() + '</div>');
+
         doForKeys(planetary_resources, function(key, value) {
             var val = roundTo(value, 3);
             var html = '<div>' + key + ': ' + val + '</div>';
@@ -325,8 +330,9 @@ $(function($) {
     }
     
     function harvestPlanetaryResource(resourceKey, harvestAmount) {
-        var amount = Math.min(discovered_tiles[resourceKey], harvestAmount);
-        var acreAmount = amount / RESOURCE_WEIGHT_BY_ACRE[resourceKey];
+        var acreWeight = RESOURCE_WEIGHT_BY_ACRE[resourceKey];
+        var amount = Math.min(discovered_tiles[resourceKey] * acreWeight, harvestAmount);
+        var acreAmount = amount / acreWeight;
         player_resources[resourceKey] += amount;
         planetary_resources[resourceKey] -= acreAmount;
         discovered_tiles[resourceKey] -= acreAmount;
@@ -421,7 +427,7 @@ $(function($) {
             
             effObjQuant = getEffectiveObjectQuantity(obj);
             multiplier = effObjQuant * obj.efficiency / (obj.period ||  1);
-            planetary_tiles.waste += effObjQuant * obj.waste;
+            planetary_tiles.waste += effObjQuant * obj.waste / RESOURCE_WEIGHT_BY_ACRE.waste;
             planetary_tiles.pollution += effObjQuant * obj.pollution;
 
             if (radarObjects.indexOf(objKey) > -1) {
@@ -433,7 +439,7 @@ $(function($) {
                 discovered_tiles.damagedLand -= m;
                 discovered_tiles.land += m;
             } else if (wasteCleaningObjects.indexOf(objKey) > -1) {
-                planetary_tiles.waste -= Math.min(multiplier, planetary_tiles.waste);
+                planetary_tiles.waste -= Math.min(multiplier / RESOURCE_WEIGHT_BY_ACRE.waste, planetary_tiles.waste);
             } else if (pollutionCleaningObjects.indexOf(objKey) > -1) {
                 planetary_tiles.pollution -= Math.min(multiplier, planetary_tiles.pollution);
             }
@@ -473,7 +479,8 @@ $(function($) {
     }
     
     function addPlayerResources(resourceKey, amount) {
-        player_resources[resourceKey] = (player_resources[resourceKey] || 0) + amount;
+        var maxAmount = Math.min(amount, getTotalStorageSpace());
+        player_resources[resourceKey] = (player_resources[resourceKey] || 0) + maxAmount;
     }
     
     function getEffectiveObjectQuantity(obj) {
@@ -520,9 +527,11 @@ $(function($) {
     
     function getTotalStorageSpace() {
         var total = 0;
-        total += building_objects.storageCrateWood.amount * 1600;
-        total += building_objects.storageCrateIron.amount * 3200;
-        total += building_objects.storageCrateSteel.amount * 4800;
+        doForKeys(building_objects, function(key, obj) {
+            if (isStorageObject(obj)) {
+                total += obj.amount * obj.efficiency;
+            }
+        });
         doForKeys(player_resources, function(key, value) {
             total -= value || 0;
         });
